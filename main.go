@@ -1,12 +1,15 @@
 package main
 
 import (
+	"io/ioutil"
 	"log"
+	"os"
 
 	"fyne.io/fyne"
 	"fyne.io/fyne/app"
 	"fyne.io/fyne/layout"
 	"fyne.io/fyne/widget"
+	"github.com/sqweek/dialog"
 )
 
 func main() {
@@ -16,8 +19,17 @@ func main() {
 	w.Resize(fyne.NewSize(640, 480))
 	le := widget.NewMultiLineEntry()
 	le.SetPlaceHolder("Please input your words!")
-	bt := widget.NewButton("Save", func() {
-		log.Println("The save button was pressed!")
+	bt := widget.NewButton("Save as...", func() {
+		filename, err := dialog.File().Filter("Text files", "txt").Title("Save as a text file").Save()
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		err = ioutil.WriteFile(filename, []byte(le.Text), os.ModePerm)
+		if err != nil {
+			log.Println(err)
+			return
+		}
 	})
 
 	box := fyne.NewContainerWithLayout(
